@@ -1,0 +1,231 @@
+'use client';
+
+import { useState, useMemo, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { useRouter } from 'next/navigation';
+import * as THREE from 'three';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+
+// Helper to generate consistent colors based on a string (repo name)
+function getRepoColors(repo: string) {
+  let hash = 0;
+  for (let i = 0; i < repo.length; i++) {
+    hash = repo.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const hue1 = Math.abs(hash) % 360;
+  const hue2 = (hue1 + 40) % 360; // Adjacent hue for gradient
+
+  const color1 = new THREE.Color().setHSL(hue1 / 360, 0.8, 0.6);
+  const color2 = new THREE.Color().setHSL(hue2 / 360, 0.8, 0.4);
+
+  return { color1, color2 };
+}
+
+// A single torus representing a contribution
+function ContributionRing({
+  work,
+  position,
+  index,
+  isHovered,
+  setHovered,
+}: {
+  work: { _meta: { path: string }; repo: string };
+  position: [number, number, number];
+  index: number;
+  isHovered: boolean;
+  setHovered: (idx: number | null) => void;
+}) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const router = useRouter();
+
+  // Custom geometry with vertex colors based on repo name
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.absarc(0, 0, 1.9, 0, Math.PI * 2, false);
+    const holePath = new THREE.Path();
+    holePath.absarc(0, 0, 1.1, 0, Math.PI * 2, true);
+    shape.holes.push(holePath);
+
+    const extrudeSettings = {
+      depth: 0.8,
+      bevelEnabled: false,
+      curveSegments: 64,
+    };
+    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+    // Center it on the Z axis (depth is 0.8, so offset by -0.4)
+    geo.translate(0, 0, -0.4);
+
+    const count = geo.attributes.position.count;
+    const colors = new Float32Array(count * 3);
+
+    const { color1, color2 } = getRepoColors(work.repo);
+
+    for (let i = 0; i < count; i++) {
+      const y = geo.attributes.position.getY(i);
+
+      // Map y from [-1.9, 1.9] to [0, 1] for gradient
+      const t = Math.max(0, Math.min(1, (y + 1.9) / 3.8));
+
+      const mixedColor = color1.clone().lerp(color2, t);
+
+      colors[i * 3] = mixedColor.r;
+      colors[i * 3 + 1] = mixedColor.g;
+      colors[i * 3 + 2] = mixedColor.b;
+    }
+
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return geo;
+  }, [work.repo]);
+
+  const material = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      roughness: 0.9,
+      metalness: 0.0,
+    });
+  }, []);
+
+  // Target position and rotation for animation
+  const targetY = isHovered ? position[1] + 1 : position[1];
+  const targetZ = isHovered ? position[2] + 2 : position[2];
+
+  useFrame((state, delta) => {
+    if (!meshRef.current) return;
+
+    // Hover lift easing
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!prefersReducedMotion) {
+      meshRef.current.position.y += (targetY - meshRef.current.position.y) * 10 * delta;
+      meshRef.current.position.z += (targetZ - meshRef.current.position.z) * 10 * delta;
+    } else {
+      meshRef.current.position.y = targetY;
+      meshRef.current.position.z = targetZ;
+    }
+  });
+
+  return (
+    <mesh
+      ref={meshRef}
+      geometry={geometry}
+      material={material}
+      position={position}
+      rotation={[0, -Math.PI / 2.2, 0]} // Angled almost completely sideways to stack like beads
+      onClick={() => router.push(`/work/${work._meta.path}`)}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHovered(index);
+        document.body.style.cursor = 'pointer';
+      }}
+      onPointerOut={() => {
+        setHovered(null);
+        document.body.style.cursor = 'auto';
+      }}
+    />
+  );
+}
+
+export default function RingField({
+  works,
+}: {
+  works: { _meta: { path: string }; repo: string }[];
+}) {
+  const [page, setPage] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const itemsPerPage = 15;
+  const totalPages = Math.ceil(works.length / itemsPerPage);
+
+  const currentWorks = works.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      // Entrance animation
+      gsap.from(containerRef.current, {
+        opacity: 0,
+        y: 50,
+        duration: 1.5,
+        ease: 'power3.out',
+        delay: 0.2,
+      });
+    },
+    { scope: containerRef },
+  );
+
+  return (
+    <div className="w-full h-full relative" ref={containerRef}>
+      {/* 3D Canvas */}
+      <Canvas
+        camera={{ position: [0, 0, 10], fov: 45 }}
+        style={{ width: '100%', height: '100%', position: 'absolute', bottom: '-20%' }}
+      >
+        <ambientLight intensity={1.5} />
+        <directionalLight position={[10, 10, 5]} intensity={2} />
+        <directionalLight position={[-10, -10, -5]} intensity={0.5} />
+
+        {currentWorks.map((work, idx) => {
+          // Horizontal row stacking, packed tightly face-to-face
+          const xOffset = (idx - (currentWorks.length - 1) / 2) * 1.2;
+          const zOffset = 0;
+
+          return (
+            <ContributionRing
+              key={work._meta.path}
+              work={work}
+              index={idx}
+              position={[xOffset, -1.0, zOffset]} // Raised Y to not clip off screen
+              isHovered={hoveredIndex === idx}
+              setHovered={setHoveredIndex}
+            />
+          );
+        })}
+      </Canvas>
+
+      {/* Overlay UI */}
+      <div className="absolute inset-x-0 bottom-12 flex flex-col items-center pointer-events-none">
+        {/* Hover Label */}
+        <div
+          className={`h-8 mb-8 transition-opacity duration-300 font-mono text-sm text-[var(--color-violet)] ${hoveredIndex !== null ? 'opacity-100' : 'opacity-0'}`}
+        >
+          {hoveredIndex !== null && currentWorks[hoveredIndex]
+            ? currentWorks[hoveredIndex].repo
+            : ''}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex items-center gap-4 pointer-events-auto bg-[var(--color-paper)]/80 backdrop-blur-sm px-4 py-2 rounded-full border border-[var(--color-hairline)]">
+          <button
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="w-8 h-8 flex items-center justify-center text-[var(--color-mist)] disabled:opacity-30 hover:text-[var(--color-ink)] transition-colors"
+            aria-label="Previous page"
+          >
+            ←
+          </button>
+
+          <div className="flex gap-2">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-colors ${i === page ? 'bg-[var(--color-ink)]' : 'bg-[var(--color-hairline)]'}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+            disabled={page === totalPages - 1}
+            className="w-8 h-8 flex items-center justify-center text-[var(--color-mist)] disabled:opacity-30 hover:text-[var(--color-ink)] transition-colors"
+            aria-label="Next page"
+          >
+            →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
