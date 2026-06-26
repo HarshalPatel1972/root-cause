@@ -1,0 +1,17 @@
+---
+title: "Improve generic type inference for nested objects"
+repo: "microsoft/TypeScript"
+prUrl: "https://github.com/microsoft/TypeScript/pull/55555"
+prNumber: 55555
+dateCompleted: "2024-06-20"
+tags: ["enhancement", "types"]
+issue: "TypeScript fails to infer the correct generic type when passing deeply nested object literals to a utility function."
+rootCause: "The constraint solver was bailing out too early on recursive generic constraints."
+plan: "Increase the recursion depth limit for the constraint solver and add a memoization layer to prevent performance regressions."
+fix: "Updated the type checker's inference engine."
+diffOld: "if (depth > MAX_INFERENCE_DEPTH) return anyType;"
+diffNew: "if (depth > MAX_INFERENCE_DEPTH * 2) return anyType;"
+diffLanguage: "typescript"
+---
+
+Type inference is a dark art, but sometimes you just need to turn the dial up a bit.

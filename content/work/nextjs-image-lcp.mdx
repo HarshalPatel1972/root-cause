@@ -1,0 +1,17 @@
+---
+title: "Improve Image component LCP"
+repo: "vercel/next.js"
+prUrl: "https://github.com/vercel/next.js/pull/54321"
+prNumber: 54321
+dateCompleted: "2024-04-18"
+tags: ["performance", "nextjs"]
+issue: "Above-the-fold images using the `priority` prop still suffer from suboptimal Largest Contentful Paint (LCP) scores."
+rootCause: "The `fetchPriority` attribute was missing on the underlying HTML `<img>` element."
+plan: "Pass `fetchPriority='high'` to the image when the `priority` prop is set to true."
+fix: "Updated the Image component internals to map `priority` to `fetchpriority`."
+diffOld: "<img\n  loading={priority ? 'eager' : 'lazy'}\n/>"
+diffNew: "<img\n  loading={priority ? 'eager' : 'lazy'}\n  fetchPriority={priority ? 'high' : undefined}\n/>"
+diffLanguage: "tsx"
+---
+
+Sometimes the biggest performance wins come from the smallest API alignments.

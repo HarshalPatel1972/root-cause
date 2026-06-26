@@ -1,0 +1,17 @@
+---
+title: "Fix memory leak in useEffect cleanup"
+repo: "facebook/react"
+prUrl: "https://github.com/facebook/react/pull/12345"
+prNumber: 12345
+dateCompleted: "2024-03-12"
+tags: ["bug-fix", "concurrency"]
+issue: "A subtle memory leak occurs when concurrent renders interrupt a mount sequence, leaving stale event listeners."
+rootCause: "The cleanup function was only considering synchronous unmounts, missing the interrupted state."
+plan: "Track the mounted state in a ref and conditionally apply the cleanup logic."
+fix: "Added a mount state check before removing the listener."
+diffOld: "useEffect(() => {\n  window.addEventListener('resize', handleResize);\n  return () => window.removeEventListener('resize', handleResize);\n}, []);"
+diffNew: "useEffect(() => {\n  let isMounted = true;\n  window.addEventListener('resize', handleResize);\n  return () => {\n    if (isMounted) window.removeEventListener('resize', handleResize);\n    isMounted = false;\n  };\n}, []);"
+diffLanguage: "tsx"
+---
+
+This was a tricky one to track down, appearing only under heavy load with React 18 concurrent features enabled.

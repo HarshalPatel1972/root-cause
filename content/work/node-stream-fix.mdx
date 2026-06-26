@@ -1,0 +1,17 @@
+---
+title: "Resolve unhandled exception in stream pipeline"
+repo: "nodejs/node"
+prUrl: "https://github.com/nodejs/node/pull/11111"
+prNumber: 11111
+dateCompleted: "2024-07-15"
+tags: ["bug-fix", "streams"]
+issue: "A specific combination of transform streams can cause an unhandled rejection error when the pipeline is abruptly closed."
+rootCause: "The destroy callback was not properly propagating errors up the pipeline chain in half-closed streams."
+plan: "Ensure the error state is checked and propagated before invoking the final callback."
+fix: "Added error state validation in the destroy hook."
+diffOld: "if (cb) process.nextTick(cb);"
+diffNew: "if (cb) process.nextTick(() => cb(this._writableState.error));"
+diffLanguage: "javascript"
+---
+
+Streams in Node.js are notoriously tricky, and edge cases around destruction are where bugs love to hide.

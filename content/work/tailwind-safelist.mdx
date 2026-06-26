@@ -1,0 +1,17 @@
+---
+title: "Fix dynamic class generation in safelist"
+repo: "tailwindlabs/tailwindcss"
+prUrl: "https://github.com/tailwindlabs/tailwindcss/pull/9876"
+prNumber: 9876
+dateCompleted: "2024-05-02"
+tags: ["bug-fix", "css"]
+issue: "Dynamically constructed class names in the safelist array are not being generated in the final CSS bundle."
+rootCause: "The regex parser was skipping safelist entries that used string interpolation without evaluating them."
+plan: "Evaluate template literals in the safelist configuration before passing to the extractor."
+fix: "Added a pre-processing step for the safelist array."
+diffOld: "const classes = config.safelist.filter(isString);"
+diffNew: "const classes = config.safelist.map(evaluate).filter(isString);"
+diffLanguage: "javascript"
+---
+
+A frustrating bug for anyone building a component library with Tailwind.

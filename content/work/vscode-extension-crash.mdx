@@ -1,0 +1,17 @@
+---
+title: "Prevent extension host crash on large files"
+repo: "microsoft/vscode"
+prUrl: "https://github.com/microsoft/vscode/pull/22222"
+prNumber: 22222
+dateCompleted: "2024-08-10"
+tags: ["performance", "editor"]
+issue: "Opening files larger than 50MB causes the extension host to crash due to OOM when semantic highlighting is enabled."
+rootCause: "The tokenizer was buffering the entire file content into a single string before processing."
+plan: "Switch the tokenizer to process the file in chunks and stream the tokens."
+fix: "Implemented a chunked reader for the semantic tokenizer."
+diffOld: "const content = document.getText();\nconst tokens = tokenize(content);"
+diffNew: "const tokens = [];\nfor (const chunk of document.getChunks()) {\n  tokens.push(...tokenize(chunk));\n}"
+diffLanguage: "typescript"
+---
+
+Nobody likes a crashed editor when they just want to read a giant JSON dump.
