@@ -77,8 +77,11 @@ export default function WorkPage({ params }: { params: { slug: string } }) {
           {work.diffOld && work.diffNew && (
             <div className="mt-8 border border-[var(--color-hairline)] rounded-md overflow-hidden">
               <DiffView
-                oldFile={{ content: work.diffOld, fileName: 'Before' }}
-                newFile={{ content: work.diffNew, fileName: 'After' }}
+                data={{
+                  oldFile: { content: work.diffOld, fileName: 'Before' },
+                  newFile: { content: work.diffNew, fileName: 'After' },
+                  hunks: [],
+                }}
               />
             </div>
           )}
