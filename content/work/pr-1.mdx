@@ -1,0 +1,34 @@
+---
+title: "Initialize the Core Fluid Rendering Engine"
+repo: "root-cause/engine"
+prUrl: "https://github.com/root-cause/engine/pull/1"
+prNumber: 1
+dateCompleted: "2024-01-01"
+tags: ["feature", "graphics", "webgl"]
+issue: "The application lacked a visual way to represent complex, swirling data streams. We needed a highly performant, visually stunning background that mimics fluid dynamics without relying on heavy physics simulations."
+rootCause: "Standard DOM elements or simple CSS gradients are insufficient for representing chaotic, turbulent data flows. A custom WebGL shader is required to achieve the desired frame rate and visual fidelity."
+plan: "Implement a custom Fractal Brownian Motion (FBM) shader applied to a full-screen quad using React Three Fiber. The shader will use domain warping to simulate fluid turbulence and will mix custom brand colors dynamically."
+fix: "Created `FluidBackground.tsx` to mount a Three.js canvas. Wrote a custom fragment shader utilizing nested Perlin noise functions to generate swirling domain-warped patterns."
+impact: "The new shader runs at a solid 60 FPS on mobile devices while providing a stunning, dynamic background that perfectly visualizes the chaotic nature of the underlying data."
+diffOld: "export default function Background() {\n  return (\n    <div className=\"bg-gradient-to-r from-blue-500 to-purple-500 w-full h-full\" />\n  );\n}"
+diffNew: "export default function Background() {\n  return (\n    <div className=\"fixed inset-0 z-0 opacity-90\">\n      <Canvas dpr={[1, 1.5]} gl={{ alpha: true }}>\n        <FluidMesh />\n      </Canvas>\n    </div>\n  );\n}"
+diffLanguage: "tsx"
+---
+
+### Implementation Details
+
+This was our very first Pull Request, laying the visual foundation for the entire project! 
+
+The core challenge was getting the **Fractal Brownian Motion (FBM)** to look organic rather than strictly mathematical. We achieved this by rotating the noise coordinates slightly at each octave to reduce axial bias:
+
+```glsl
+// Rotate to reduce axial bias
+mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.50));
+for (int i = 0; i < 5; ++i) {
+  v += a * cnoise(x);
+  x = rot * x * 2.0 + shift;
+  a *= 0.5;
+}
+```
+
+By layering multiple instances of this `fbm` function and using the output of one as the coordinate input for the next (a technique known as **Domain Warping**), we created the illusion of deep, flowing fluid without ever writing a physics solver.
