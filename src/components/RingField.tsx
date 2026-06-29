@@ -115,6 +115,7 @@ function ContributionRing({
       geometry={geometry}
       material={material}
       position={position}
+      scale={0.7}
       rotation={[-Math.PI / 2, 0, 0]} // Rotate to lie flat like a stack of coins
       onClick={() => {
         if (work) router.push(`/work/${work._meta.path}`);
@@ -170,7 +171,7 @@ export default function RingField({
       {/* 3D Canvas */}
       <Canvas
         camera={{ position: [0, 0, 100], fov: 10 }}
-        style={{ width: '100%', height: '100%', position: 'absolute', bottom: '-20%' }}
+        style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
       >
         <ambientLight intensity={1.5} />
         <directionalLight position={[10, 10, 5]} intensity={2} />
@@ -178,9 +179,9 @@ export default function RingField({
 
         {currentWorks.map((work, idx) => {
           // Vertical column stacking on the right side
-          const xOffset = 5.0;
-          // Invert yOffset so idx=0 is near the top
-          const yOffset = -((idx - (currentWorks.length - 1) / 2) * 0.9);
+          const xOffset = 8.0;
+          // Invert yOffset so idx=0 is near the top (scaled down to 0.57 gap)
+          const yOffset = -((idx - (currentWorks.length - 1) / 2) * 0.57);
           const zOffset = 0;
 
           return (
