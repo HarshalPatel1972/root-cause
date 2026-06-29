@@ -106,9 +106,6 @@ function ContributionDisk({
       hex = repoColors.hex;
     }
 
-    // Make the base color more diffused (lower saturation, slightly lighter)
-    color1.offsetHSL(0, -0.3, 0.1);
-
     // Top face — lighter, catches highlight
     const topColor = color1.clone();
     topColor.offsetHSL(0, -0.05, 0.12);
