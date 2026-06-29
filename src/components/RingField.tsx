@@ -216,7 +216,7 @@ function ContributionDisk({
         receiveShadow
       />
 
-      {/* Bevel ring — thin torus at the edge for that polished rim catch */}
+      {/* Bevel ring — temporarily removed, will be added back in the future
       <mesh scale={1.2}>
         <torusGeometry args={[DISK_OUTER_RADIUS, 0.04, 8, 64]} />
         <meshStandardMaterial
@@ -227,6 +227,7 @@ function ContributionDisk({
           opacity={0.3}
         />
       </mesh>
+      */}
 
       {/* Repo name on the front face */}
       <group rotation={[0, -0.08, 0]}>
