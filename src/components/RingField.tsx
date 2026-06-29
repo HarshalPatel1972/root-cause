@@ -232,7 +232,7 @@ function ContributionDisk({
       {/* Repo name on the front face */}
       <group rotation={[0, -0.08, 0]}>
         <Text
-          position={[0, DISK_HEIGHT * 0.62, DISK_OUTER_RADIUS * 1.21]}
+          position={[0, 0, DISK_OUTER_RADIUS * 1.21]}
           fontSize={0.35}
           fontWeight="bold"
           color={textColor}
