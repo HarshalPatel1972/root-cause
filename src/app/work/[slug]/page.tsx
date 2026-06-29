@@ -34,143 +34,138 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
   const sortedWorks = [...allWorks].sort(
     (a, b) => new Date(a.dateCompleted).getTime() - new Date(b.dateCompleted).getTime()
   );
-  const currentIndex = sortedWorks.findIndex((w) => w._meta.path === params.slug);
+  const currentIndex = sortedWorks.findIndex((w) => w._meta.path === resolvedParams.slug);
   const prevWork = currentIndex > 0 ? sortedWorks[currentIndex - 1] : null;
   const nextWork = currentIndex < sortedWorks.length - 1 ? sortedWorks[currentIndex + 1] : null;
 
   return (
-    <article className="p-8 max-w-3xl mx-auto pb-24">
-      <Link
-        href="/"
-        className="inline-block mb-8 text-sm font-sans font-medium hover:text-[var(--color-violet)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-violet)] rounded"
-      >
-        ← Back
-      </Link>
-
-      {/* Header with repo chip + PR link */}
-      <header className="mb-12">
-        <div className="flex items-center gap-3 mb-4 flex-wrap">
-          <span className="font-mono text-sm text-[var(--color-violet)] bg-[var(--color-violet)]/8 px-3 py-1 rounded-full">
-            {work.repo}
-          </span>
-          <span className="font-mono text-xs text-[var(--color-mist)]">
-            #{work.prNumber}
-          </span>
-          <span className="font-mono text-xs text-[var(--color-mist)]">
-            {work.dateCompleted}
-          </span>
-        </div>
-        <h1 className="font-display text-4xl font-bold leading-tight">{work.title}</h1>
-      </header>
-
-      <div className="space-y-12">
-        {/* The Issue */}
-        <section>
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4">
-            The issue
-          </h2>
-          <p className="text-lg leading-relaxed">{work.issue}</p>
-        </section>
-
-        {/* Root Cause — hero section with violet left border */}
-        <section className="border-l-[3px] border-[var(--color-violet)] pl-6 py-1">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-violet)] mb-4">
-            Root cause
-          </h2>
-          <p className="text-lg leading-relaxed font-medium">{work.rootCause}</p>
-        </section>
-
-        {/* The Plan */}
-        <section>
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4">
-            The plan
-          </h2>
-          <p className="text-lg leading-relaxed">{work.plan}</p>
-        </section>
-
-        {/* The Fix */}
-        <section>
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4">
-            The fix
-          </h2>
-          <p className="text-lg leading-relaxed mb-6">{work.fix}</p>
-
-          <div className="prose prose-slate max-w-none">
-            <MDXContent code={work.mdx} />
+    <div className="h-screen w-full flex flex-col overflow-hidden bg-[var(--color-paper)]">
+      {/* Fixed Header */}
+      <header className="flex-none p-6 border-b border-[var(--color-hairline)] flex flex-col gap-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <Link
+              href="/"
+              className="inline-block mb-4 text-sm font-sans font-medium text-[var(--color-mist)] hover:text-[var(--color-violet)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-violet)] rounded"
+            >
+              ← Back to Scene
+            </Link>
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
+              <span className="font-mono text-sm text-[var(--color-violet)] bg-[var(--color-violet)]/10 px-3 py-1 rounded-full border border-[var(--color-violet)]/20">
+                {work.repo}
+              </span>
+              <a
+                href={work.prUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-[var(--color-mist)] hover:text-[var(--color-violet)] transition-colors flex items-center gap-1"
+              >
+                #{work.prNumber} ↗
+              </a>
+              <span className="font-mono text-xs text-[var(--color-mist)]/50">
+                {work.dateCompleted}
+              </span>
+            </div>
+            <h1 className="font-display text-2xl font-bold leading-tight">{work.title}</h1>
           </div>
 
-          {work.diffOld && work.diffNew && (
-            <div className="mt-8 border border-[var(--color-hairline)] rounded-md overflow-hidden">
-              <DiffView
-                data={{
-                  oldFile: { content: work.diffOld, fileName: 'Before' },
-                  newFile: { content: work.diffNew, fileName: 'After' },
-                  hunks: [],
-                }}
-              />
+          {/* Prev / Next Navigation */}
+          <nav className="flex items-center gap-8 text-right">
+            {prevWork && (
+              <Link
+                href={`/work/${prevWork._meta.path}`}
+                className="group flex flex-col items-end text-right"
+              >
+                <span className="font-mono text-[10px] text-[var(--color-mist)] uppercase tracking-widest mb-1">
+                  ← Previous
+                </span>
+                <span className="font-sans text-sm font-medium text-[var(--color-mist)] group-hover:text-[var(--color-violet)] transition-colors">
+                  {prevWork.title}
+                </span>
+              </Link>
+            )}
+            {nextWork && (
+              <Link
+                href={`/work/${nextWork._meta.path}`}
+                className="group flex flex-col items-start text-left"
+              >
+                <span className="font-mono text-[10px] text-[var(--color-mist)] uppercase tracking-widest mb-1">
+                  Next →
+                </span>
+                <span className="font-sans text-sm font-medium text-[var(--color-mist)] group-hover:text-[var(--color-violet)] transition-colors">
+                  {nextWork.title}
+                </span>
+              </Link>
+            )}
+          </nav>
+        </div>
+      </header>
+
+      {/* 4-Quadrant Grid */}
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 grid-rows-4 lg:grid-rows-2 gap-4 p-4 min-h-0 overflow-y-auto lg:overflow-hidden">
+        
+        {/* Quadrant 1: The Issue */}
+        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+            1. The issue
+          </h2>
+          <p className="text-base leading-relaxed flex-1">{work.issue}</p>
+        </section>
+
+        {/* Quadrant 2: Root Cause */}
+        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-violet)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+            2. Root cause
+          </h2>
+          <p className="text-base leading-relaxed font-medium flex-1">{work.rootCause}</p>
+        </section>
+
+        {/* Quadrant 3: The Plan */}
+        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+            3. The plan
+          </h2>
+          <p className="text-base leading-relaxed flex-1">{work.plan}</p>
+          
+          {'impact' in work && work.impact && (
+            <div className="mt-8 pt-6 border-t border-[var(--color-hairline)]">
+              <h3 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4">
+                Expected Impact
+              </h3>
+              <p className="text-sm text-[var(--color-mist)] leading-relaxed">{work.impact}</p>
             </div>
           )}
         </section>
 
-        {/* The Impact */}
-        {'impact' in work && work.impact && (
-          <section>
-            <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4">
-              The impact
-            </h2>
-            <p className="text-lg leading-relaxed">{work.impact}</p>
-          </section>
-        )}
+        {/* Quadrant 4: The Fix */}
+        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+            4. The fix
+          </h2>
+          <div className="flex-1 space-y-6">
+            <p className="text-base leading-relaxed">{work.fix}</p>
 
-        {/* View on GitHub */}
-        <div className="pt-4">
-          <a
-            href={work.prUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 font-mono text-sm text-[var(--color-violet)] hover:text-[var(--color-deep-violet)] transition-colors border border-[var(--color-violet)]/30 hover:border-[var(--color-violet)] px-4 py-2.5 rounded-md"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-            </svg>
-            View PR #{work.prNumber} on GitHub
-          </a>
-        </div>
+            {work.mdx && (
+              <div className="prose prose-sm prose-invert max-w-none prose-pre:bg-black/40 prose-pre:border prose-pre:border-[var(--color-hairline)]">
+                <MDXContent code={work.mdx} />
+              </div>
+            )}
 
-        {/* Prev / Next Navigation */}
-        <nav className="flex justify-between items-start pt-8 border-t border-[var(--color-hairline)]">
-          {prevWork ? (
-            <Link
-              href={`/work/${prevWork._meta.path}`}
-              className="group text-left max-w-[45%]"
-            >
-              <span className="font-mono text-xs text-[var(--color-mist)] uppercase tracking-widest block mb-1">
-                ← Previous
-              </span>
-              <span className="font-sans text-sm font-medium group-hover:text-[var(--color-violet)] transition-colors">
-                {prevWork.title}
-              </span>
-            </Link>
-          ) : (
-            <div />
-          )}
-          {nextWork ? (
-            <Link
-              href={`/work/${nextWork._meta.path}`}
-              className="group text-right max-w-[45%]"
-            >
-              <span className="font-mono text-xs text-[var(--color-mist)] uppercase tracking-widest block mb-1">
-                Next →
-              </span>
-              <span className="font-sans text-sm font-medium group-hover:text-[var(--color-violet)] transition-colors">
-                {nextWork.title}
-              </span>
-            </Link>
-          ) : (
-            <div />
-          )}
-        </nav>
-      </div>
-    </article>
+            {work.diffOld && work.diffNew && (
+              <div className="border border-[var(--color-hairline)] rounded-md overflow-hidden bg-black/40">
+                <DiffView
+                  data={{
+                    oldFile: { content: work.diffOld, fileName: 'Before' },
+                    newFile: { content: work.diffNew, fileName: 'After' },
+                    hunks: [],
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </section>
+
+      </main>
+    </div>
   );
 }
