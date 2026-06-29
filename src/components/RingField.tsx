@@ -252,15 +252,15 @@ export default function RingField() {
     scrollState.current.lastY = e.clientY;
     
     // Upward drag -> positive deltaY
-    const moveAmount = deltaY * 0.05;
+    const moveAmount = deltaY * 0.06;
     scrollState.current.targetOffset += moveAmount;
     scrollState.current.dragVelocity = moveAmount; // Capture momentum
   };
 
   const handlePointerUp = () => {
     scrollState.current.isDragging = false;
-    // Apply throw momentum when letting go
-    scrollState.current.targetOffset += scrollState.current.dragVelocity * 10.0;
+    // Apply throw momentum when letting go (higher multiplier = more glide)
+    scrollState.current.targetOffset += scrollState.current.dragVelocity * 30.0;
   };
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -279,16 +279,15 @@ export default function RingField() {
         return;
       }
       
-      // Auto-scroll constant upward drift
-      if (!scrollState.current.isDragging) {
-        scrollState.current.targetOffset += 1.0 * delta;
-      }
+      // Auto-scroll constant upward drift (always applies, even while clicking/holding)
+      scrollState.current.targetOffset += 1.0 * delta;
       
       // Smoothly interpolate current offset towards targetOffset (handles dragging and momentum)
+      // Lower lerp factor = more "glide" and less friction
       scrollState.current.offset = THREE.MathUtils.lerp(
         scrollState.current.offset,
         scrollState.current.targetOffset,
-        8.0 * delta
+        4.0 * delta
       );
     });
     return null;
