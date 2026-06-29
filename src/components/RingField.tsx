@@ -31,7 +31,7 @@ function ContributionRing({
   isHovered,
   setHovered,
 }: {
-  work: { _meta: { path: string }; repo: string };
+  work: { _meta: { path: string }; repo: string } | null;
   position: [number, number, number];
   index: number;
   isHovered: boolean;
@@ -61,7 +61,10 @@ function ContributionRing({
     const count = geo.attributes.position.count;
     const colors = new Float32Array(count * 3);
 
-    const { color1, color2 } = getRepoColors(work.repo);
+    const hue1 = (index * 12) % 360;
+    const hue2 = (hue1 + 40) % 360;
+    const color1 = new THREE.Color().setHSL(hue1 / 360, 0.8, 0.6);
+    const color2 = new THREE.Color().setHSL(hue2 / 360, 0.8, 0.4);
 
     for (let i = 0; i < count; i++) {
       const y = geo.attributes.position.getY(i);
@@ -78,7 +81,7 @@ function ContributionRing({
 
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return geo;
-  }, [work.repo]);
+  }, [index]);
 
   const material = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -112,14 +115,18 @@ function ContributionRing({
       geometry={geometry}
       material={material}
       position={position}
-      rotation={[0, -Math.PI / 2.2, 0]} // Angled almost completely sideways to stack like beads
-      onClick={() => router.push(`/work/${work._meta.path}`)}
+      rotation={[0, -Math.PI / 2, 0]} // Angled completely sideways so thickness is exactly 0.8
+      onClick={() => {
+        if (work) router.push(`/work/${work._meta.path}`);
+      }}
       onPointerOver={(e) => {
+        if (!work) return;
         e.stopPropagation();
         setHovered(index);
         document.body.style.cursor = 'pointer';
       }}
       onPointerOut={() => {
+        if (!work) return;
         setHovered(null);
         document.body.style.cursor = 'auto';
       }}
@@ -132,13 +139,15 @@ export default function RingField({
 }: {
   works: { _meta: { path: string }; repo: string }[];
 }) {
+  // Pad the works array to 30 items with nulls for decorative rings
+  const paddedWorks = Array.from({ length: 30 }).map((_, i) => works[i] || null);
   const [page, setPage] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const itemsPerPage = 15;
-  const totalPages = Math.ceil(works.length / itemsPerPage);
+  const itemsPerPage = 30;
+  const totalPages = Math.ceil(paddedWorks.length / itemsPerPage);
 
-  const currentWorks = works.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+  const currentWorks = paddedWorks.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -160,7 +169,7 @@ export default function RingField({
     <div className="w-full h-full relative" ref={containerRef}>
       {/* 3D Canvas */}
       <Canvas
-        camera={{ position: [0, 0, 10], fov: 45 }}
+        camera={{ position: [0, 0, 100], fov: 10 }}
         style={{ width: '100%', height: '100%', position: 'absolute', bottom: '-20%' }}
       >
         <ambientLight intensity={1.5} />
@@ -169,12 +178,12 @@ export default function RingField({
 
         {currentWorks.map((work, idx) => {
           // Horizontal row stacking, packed tightly face-to-face
-          const xOffset = (idx - (currentWorks.length - 1) / 2) * 1.2;
+          const xOffset = (idx - (currentWorks.length - 1) / 2) * 0.9;
           const zOffset = 0;
 
           return (
             <ContributionRing
-              key={work._meta.path}
+              key={work ? work._meta.path : `empty-${idx}`}
               work={work}
               index={idx}
               position={[xOffset, -1.0, zOffset]} // Raised Y to not clip off screen
