@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, Suspense, useState, useCallback } from 'react';
+import { useMemo, useRef, Suspense, useCallback } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text, ContactShadows } from '@react-three/drei';
 import { useRouter } from 'next/navigation';
@@ -272,7 +272,6 @@ function FrameNumber({
         color="#6b6b72"
         anchorX="right"
         anchorY="middle"
-        font="/fonts/JetBrainsMono-Regular.ttf"
       >
         {`#${index % 21}`}
       </Text>
