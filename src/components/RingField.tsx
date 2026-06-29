@@ -10,6 +10,20 @@ import gsap from 'gsap';
 
 // Helper to generate consistent colors based on a string (repo name)
 function getRepoColors(repo: string) {
+  const brandColors: Record<string, { c1: string; c2: string }> = {
+    'facebook/react': { c1: '#61dafb', c2: '#282c34' },
+    'tailwindlabs/tailwindcss': { c1: '#38bdf8', c2: '#0ea5e9' },
+    'microsoft/TypeScript': { c1: '#3178c6', c2: '#235a97' },
+    'microsoft/vscode': { c1: '#0078d7', c2: '#005a9e' },
+  };
+
+  if (brandColors[repo]) {
+    return {
+      color1: new THREE.Color(brandColors[repo].c1),
+      color2: new THREE.Color(brandColors[repo].c2),
+    };
+  }
+
   let hash = 0;
   for (let i = 0; i < repo.length; i++) {
     hash = repo.charCodeAt(i) + ((hash << 5) - hash);
@@ -46,7 +60,7 @@ function ContributionRing({
 
   useEffect(() => {
     localY.current = position[1];
-  }, [position]);
+  }, [position[1]]);
 
   // Custom geometry with vertex colors based on repo name
   const geometry = useMemo(() => {
