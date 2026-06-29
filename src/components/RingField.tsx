@@ -68,15 +68,11 @@ function ContributionRing({
   work,
   position,
   index,
-  isHovered,
-  setHovered,
   totalItems,
 }: {
   work: { _meta: { path: string }; repo: string } | null;
   position: [number, number, number];
   index: number;
-  isHovered: boolean;
-  setHovered: (idx: number | null) => void;
   totalItems: number;
 }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -142,10 +138,6 @@ function ContributionRing({
     });
   }, []);
 
-  // Target position and rotation for animation
-  const targetX = isHovered ? position[0] - 1.5 : position[0];
-  const targetZ = isHovered ? position[2] + 2 : position[2];
-
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
@@ -155,7 +147,7 @@ function ContributionRing({
       localY.current += 1.0 * delta;
 
       // Wrap around logic
-      const gap = 1.1;
+      const gap = 1.5;
       const totalSpan = totalItems * gap;
       const maxBound = totalSpan / 2;
 
@@ -164,12 +156,12 @@ function ContributionRing({
       }
 
       groupRef.current.position.y = localY.current;
-      groupRef.current.position.x += (targetX - groupRef.current.position.x) * 10 * delta;
-      groupRef.current.position.z += (targetZ - groupRef.current.position.z) * 10 * delta;
+      groupRef.current.position.x = position[0];
+      groupRef.current.position.z = position[2];
     } else {
       groupRef.current.position.y = localY.current;
-      groupRef.current.position.x = targetX;
-      groupRef.current.position.z = targetZ;
+      groupRef.current.position.x = position[0];
+      groupRef.current.position.z = position[2];
     }
   });
 
@@ -179,17 +171,6 @@ function ContributionRing({
       position={position}
       onClick={() => {
         if (work) router.push(`/work/${work._meta.path}`);
-      }}
-      onPointerOver={(e) => {
-        if (!work) return;
-        e.stopPropagation();
-        setHovered(index);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        if (!work) return;
-        setHovered(null);
-        document.body.style.cursor = 'auto';
       }}
     >
       <mesh
@@ -253,7 +234,6 @@ export default function RingField({
     };
   });
   const [page, setPage] = useState(0);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const itemsPerPage = 30;
   const totalPages = Math.ceil(paddedWorks.length / itemsPerPage);
@@ -300,8 +280,8 @@ export default function RingField({
           {currentWorks.map((work, idx) => {
             // Vertical column stacking on the right side
             const xOffset = 8.0;
-            // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 1.1)
-            const yOffset = (idx - (currentWorks.length - 1) / 2) * 1.1;
+            // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 1.5)
+            const yOffset = (idx - (currentWorks.length - 1) / 2) * 1.5;
             const zOffset = 0;
 
             return (
@@ -310,8 +290,6 @@ export default function RingField({
                 work={work}
                 index={idx}
                 position={[xOffset, yOffset, zOffset]}
-                isHovered={hoveredIndex === idx}
-                setHovered={setHoveredIndex}
                 totalItems={currentWorks.length}
               />
             );
