@@ -45,14 +45,16 @@ export default function RootLayout({
       <body className="h-full bg-[var(--color-paper)] p-[14px]">
         {/* The Frame */}
         <div className="relative h-full w-full rounded-[4px] border-[3px] border-[var(--color-ink)] overflow-hidden flex flex-col">
-          {/* Nav / Header placeholder */}
+          {/* Nav / Header */}
           <header className="flex-none p-6 flex justify-between items-center z-10 relative">
-            <div className="flex items-baseline gap-4">
+            <div className="flex items-center gap-2.5">
+              {/* Debug breakpoint icon */}
+              <span className="relative flex items-center justify-center w-5 h-5">
+                <span className="absolute w-2.5 h-2.5 rounded-full bg-[var(--color-violet)]" />
+                <span className="absolute w-2.5 h-2.5 rounded-full bg-[var(--color-violet)] animate-ping opacity-20" />
+              </span>
               <span className="font-display font-semibold text-xl tracking-tight text-[var(--color-ink)]">
                 Root Cause
-              </span>
-              <span className="font-mono text-sm text-[var(--color-mist)] hidden sm:inline">
-                Not just what changed. Why it changed.
               </span>
             </div>
             <nav className="font-sans font-medium text-sm flex gap-6">

@@ -20,6 +20,7 @@ var works = defineCollection({
     diffOld: z.string().optional(),
     diffNew: z.string().optional(),
     diffLanguage: z.string().optional(),
+    impact: z.string().optional(),
     content: z.string()
   }),
   transform: async (document, context) => {

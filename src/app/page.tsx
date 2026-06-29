@@ -7,16 +7,76 @@ export default function Home() {
     (a, b) => new Date(b.dateCompleted).getTime() - new Date(a.dateCompleted).getTime(),
   );
 
+  const uniqueRepos = new Set(sortedWorks.map((w) => w.repo));
+
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {/* Hero text */}
-      <div className="absolute top-1/2 -translate-y-1/2 left-12 z-20 pointer-events-none">
-        <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight text-[var(--color-ink)] max-w-2xl mb-4 pointer-events-auto">
+      {/* Hero text — left side */}
+      <div className="absolute top-1/2 -translate-y-1/2 left-12 z-20 pointer-events-none max-w-xl">
+        <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight text-[var(--color-ink)] mb-4 pointer-events-auto leading-[1.05]">
           I read other people&apos;s stack traces for fun.
         </h1>
-        <p className="font-mono text-sm text-[var(--color-mist)] uppercase tracking-widest pointer-events-auto">
+        <p className="font-mono text-sm text-[var(--color-mist)] uppercase tracking-widest pointer-events-auto mb-6">
           Not just what changed. Why it changed.
         </p>
+        <p className="font-sans text-sm text-[var(--color-mist)]/70 pointer-events-auto">
+          Click any disk to see the issue, the cause, and the fix.
+        </p>
+      </div>
+
+      {/* Bottom-left stats row */}
+      <div className="absolute bottom-8 left-12 z-20 pointer-events-none">
+        <div className="flex items-center gap-6 font-mono text-xs text-[var(--color-mist)] tracking-wider">
+          <span>
+            <span className="text-[var(--color-ink)] font-medium text-sm">{sortedWorks.length}</span>{' '}
+            PRs merged
+          </span>
+          <span className="text-[var(--color-hairline)]">·</span>
+          <span>
+            <span className="text-[var(--color-ink)] font-medium text-sm">{uniqueRepos.size}</span>{' '}
+            repos touched
+          </span>
+          <span className="text-[var(--color-hairline)]">·</span>
+          <span>
+            <span className="text-[var(--color-ink)] font-medium text-sm">21</span>{' '}
+            orgs
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom-right scroll hint */}
+      <div className="absolute bottom-8 right-12 z-20 pointer-events-none">
+        <div className="flex items-center gap-2 font-mono text-xs text-[var(--color-mist)]/50 tracking-wider animate-pulse">
+          <span>scroll the stack</span>
+          <svg
+            width="12"
+            height="16"
+            viewBox="0 0 12 16"
+            fill="none"
+            className="opacity-50"
+          >
+            <path
+              d="M6 1L6 15M6 1L2 5M6 1L10 5M6 15L2 11M6 15L10 11"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      </div>
+
+      {/* Vertical margin label — rotated text on the left edge */}
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+        <span
+          className="font-mono text-[10px] text-[var(--color-hairline)] uppercase tracking-[0.3em] block"
+          style={{
+            writingMode: 'vertical-lr',
+            transform: 'rotate(180deg)',
+          }}
+        >
+          [ stack ]
+        </span>
       </div>
 
       {/* Accessible fallback link list (visually hidden but focusable) */}
