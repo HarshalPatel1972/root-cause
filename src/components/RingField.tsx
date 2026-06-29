@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useRouter } from 'next/navigation';
 import * as THREE from 'three';
@@ -36,9 +36,15 @@ function ContributionRing({
   index: number;
   isHovered: boolean;
   setHovered: (idx: number | null) => void;
+  totalItems: number;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const router = useRouter();
+  const localY = useRef(position[1]);
+
+  useEffect(() => {
+    localY.current = position[1];
+  }, [position]);
 
   // Custom geometry with vertex colors based on repo name
   const geometry = useMemo(() => {
@@ -98,12 +104,25 @@ function ContributionRing({
   useFrame((state, delta) => {
     if (!meshRef.current) return;
 
-    // Hover lift easing
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!prefersReducedMotion) {
+      // Continuous upward motion
+      localY.current += 1.0 * delta;
+
+      // Wrap around logic
+      const gap = 0.65;
+      const totalSpan = totalItems * gap;
+      const maxBound = totalSpan / 2;
+
+      if (localY.current > maxBound) {
+        localY.current -= totalSpan;
+      }
+
+      meshRef.current.position.y = localY.current;
       meshRef.current.position.x += (targetX - meshRef.current.position.x) * 10 * delta;
       meshRef.current.position.z += (targetZ - meshRef.current.position.z) * 10 * delta;
     } else {
+      meshRef.current.position.y = localY.current;
       meshRef.current.position.x = targetX;
       meshRef.current.position.z = targetZ;
     }
@@ -171,7 +190,15 @@ export default function RingField({
       {/* 3D Canvas */}
       <Canvas
         camera={{ position: [0, 0, 100], fov: 10 }}
-        style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          inset: 0,
+          maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
+          WebkitMaskImage:
+            'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
+        }}
       >
         <ambientLight intensity={1.5} />
         <directionalLight position={[10, 10, 5]} intensity={2} />
@@ -180,8 +207,8 @@ export default function RingField({
         {currentWorks.map((work, idx) => {
           // Vertical column stacking on the right side
           const xOffset = 8.0;
-          // Invert yOffset so idx=0 is near the top (scaled down to 0.57 gap)
-          const yOffset = -((idx - (currentWorks.length - 1) / 2) * 0.57);
+          // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 0.65)
+          const yOffset = (idx - (currentWorks.length - 1) / 2) * 0.65;
           const zOffset = 0;
 
           return (
@@ -192,6 +219,7 @@ export default function RingField({
               position={[xOffset, yOffset, zOffset]}
               isHovered={hoveredIndex === idx}
               setHovered={setHoveredIndex}
+              totalItems={currentWorks.length}
             />
           );
         })}
