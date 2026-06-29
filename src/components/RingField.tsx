@@ -161,7 +161,8 @@ function ContributionRing({
       />
       {work && (
         <Text
-          position={[0, 0, 2.4]}
+          position={[0, 0, 2.3]}
+          curveRadius={2.3}
           fontSize={0.4}
           fontWeight="bold"
           color="white"
