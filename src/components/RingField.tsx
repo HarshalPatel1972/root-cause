@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import * as THREE from 'three';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { allWorks } from 'content-collections';
 
 // ── Brand color map ────────────────────────────────────────────────
 function getRepoColors(repo: string) {
@@ -274,7 +275,7 @@ function FrameNumber({
         anchorX="right"
         anchorY="middle"
       >
-        {`#${TOTAL_ITEMS - index}`}
+        {`#${index + 1}`}
       </Text>
     </group>
   );
@@ -348,14 +349,19 @@ export default function RingField() {
     'LenovoLegionToolkit-Team/LenovoLegionToolkit',
   ];
 
-  const paddedWorks = useMemo(
-    () =>
-      Array.from({ length: TOTAL_ITEMS }).map((_, i) => ({
+  const paddedWorks = useMemo(() => {
+    const sortedWorks = [...allWorks].sort(
+      (a, b) => new Date(a.dateCompleted).getTime() - new Date(b.dateCompleted).getTime()
+    );
+
+    return Array.from({ length: TOTAL_ITEMS }).map((_, i) => {
+      if (i < sortedWorks.length) return sortedWorks[i];
+      return {
         _meta: { path: `mock-${i}` },
         repo: mockRepos[i % mockRepos.length],
-      })),
-    []
-  );
+      };
+    });
+  }, []);
 
   const scrollState = useRef({
     offset: 0,

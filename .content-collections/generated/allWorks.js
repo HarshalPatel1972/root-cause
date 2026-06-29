@@ -55,6 +55,35 @@ export default [
     "mdx": "var Component=(()=>{var x=Object.create;var r=Object.defineProperty;var l=Object.getOwnPropertyDescriptor;var p=Object.getOwnPropertyNames;var _=Object.getPrototypeOf,f=Object.prototype.hasOwnProperty;var h=(e,n)=>()=>(n||e((n={exports:{}}).exports,n),n.exports),j=(e,n)=>{for(var t in n)r(e,t,{get:n[t],enumerable:!0})},a=(e,n,t,c)=>{if(n&&typeof n==\"object\"||typeof n==\"function\")for(let o of p(n))!f.call(e,o)&&o!==t&&r(e,o,{get:()=>n[o],enumerable:!(c=l(n,o))||c.enumerable});return e};var y=(e,n,t)=>(t=e!=null?x(_(e)):{},a(n||!e||!e.__esModule?r(t,\"default\",{value:e,enumerable:!0}):t,e)),M=e=>a(r({},\"__esModule\",{value:!0}),e);var u=h((C,i)=>{i.exports=_jsx_runtime});var g={};j(g,{default:()=>m});var s=y(u());function d(e){let n={p:\"p\",...e.components};return(0,s.jsx)(n.p,{children:\"Streams in Node.js are notoriously tricky, and edge cases around destruction are where bugs love to hide.\"})}function m(e={}){let{wrapper:n}=e.components||{};return n?(0,s.jsx)(n,{...e,children:(0,s.jsx)(d,{...e})}):d(e)}return M(g);})();\n;return Component;"
   },
   {
+    "title": "Initialize the Core Fluid Rendering Engine",
+    "repo": "root-cause/engine",
+    "prUrl": "https://github.com/root-cause/engine/pull/1",
+    "prNumber": 1,
+    "dateCompleted": "2024-01-01",
+    "tags": [
+      "feature",
+      "graphics",
+      "webgl"
+    ],
+    "issue": "The application lacked a visual way to represent complex, swirling data streams. We needed a highly performant, visually stunning background that mimics fluid dynamics without relying on heavy physics simulations.",
+    "rootCause": "Standard DOM elements or simple CSS gradients are insufficient for representing chaotic, turbulent data flows. A custom WebGL shader is required to achieve the desired frame rate and visual fidelity.",
+    "plan": "Implement a custom Fractal Brownian Motion (FBM) shader applied to a full-screen quad using React Three Fiber. The shader will use domain warping to simulate fluid turbulence and will mix custom brand colors dynamically.",
+    "fix": "Created `FluidBackground.tsx` to mount a Three.js canvas. Wrote a custom fragment shader utilizing nested Perlin noise functions to generate swirling domain-warped patterns.",
+    "diffOld": "export default function Background() {\n  return (\n    <div className=\"bg-gradient-to-r from-blue-500 to-purple-500 w-full h-full\" />\n  );\n}",
+    "diffNew": "export default function Background() {\n  return (\n    <div className=\"fixed inset-0 z-0 opacity-90\">\n      <Canvas dpr={[1, 1.5]} gl={{ alpha: true }}>\n        <FluidMesh />\n      </Canvas>\n    </div>\n  );\n}",
+    "diffLanguage": "tsx",
+    "impact": "The new shader runs at a solid 60 FPS on mobile devices while providing a stunning, dynamic background that perfectly visualizes the chaotic nature of the underlying data.",
+    "content": "### Implementation Details\n\nThis was our very first Pull Request, laying the visual foundation for the entire project! \n\nThe core challenge was getting the **Fractal Brownian Motion (FBM)** to look organic rather than strictly mathematical. We achieved this by rotating the noise coordinates slightly at each octave to reduce axial bias:\n\n```glsl\n// Rotate to reduce axial bias\nmat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.50));\nfor (int i = 0; i < 5; ++i) {\n  v += a * cnoise(x);\n  x = rot * x * 2.0 + shift;\n  a *= 0.5;\n}\n```\n\nBy layering multiple instances of this `fbm` function and using the output of one as the coordinate input for the next (a technique known as **Domain Warping**), we created the illusion of deep, flowing fluid without ever writing a physics solver.",
+    "_meta": {
+      "filePath": "pr-1.mdx",
+      "fileName": "pr-1.mdx",
+      "directory": ".",
+      "extension": "mdx",
+      "path": "pr-1"
+    },
+    "mdx": "var Component=(()=>{var u=Object.create;var a=Object.defineProperty;var g=Object.getOwnPropertyDescriptor;var m=Object.getOwnPropertyNames;var p=Object.getPrototypeOf,f=Object.prototype.hasOwnProperty;var x=(n,e)=>()=>(e||n((e={exports:{}}).exports,e),e.exports),w=(n,e)=>{for(var i in e)a(n,i,{get:e[i],enumerable:!0})},s=(n,e,i,r)=>{if(e&&typeof e==\"object\"||typeof e==\"function\")for(let o of m(e))!f.call(n,o)&&o!==i&&a(n,o,{get:()=>e[o],enumerable:!(r=g(e,o))||r.enumerable});return n};var y=(n,e,i)=>(i=n!=null?u(p(n)):{},s(e||!n||!n.__esModule?a(i,\"default\",{value:n,enumerable:!0}):i,n)),v=n=>s(a({},\"__esModule\",{value:!0}),n);var l=x((M,c)=>{c.exports=_jsx_runtime});var _={};w(_,{default:()=>d});var t=y(l());function h(n){let e={code:\"code\",h3:\"h3\",p:\"p\",pre:\"pre\",strong:\"strong\",...n.components};return(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(e.h3,{children:\"Implementation Details\"}),`\n`,(0,t.jsx)(e.p,{children:\"This was our very first Pull Request, laying the visual foundation for the entire project!\"}),`\n`,(0,t.jsxs)(e.p,{children:[\"The core challenge was getting the \",(0,t.jsx)(e.strong,{children:\"Fractal Brownian Motion (FBM)\"}),\" to look organic rather than strictly mathematical. We achieved this by rotating the noise coordinates slightly at each octave to reduce axial bias:\"]}),`\n`,(0,t.jsx)(e.pre,{children:(0,t.jsx)(e.code,{className:\"language-glsl\",children:`// Rotate to reduce axial bias\nmat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.50));\nfor (int i = 0; i < 5; ++i) {\n  v += a * cnoise(x);\n  x = rot * x * 2.0 + shift;\n  a *= 0.5;\n}\n`})}),`\n`,(0,t.jsxs)(e.p,{children:[\"By layering multiple instances of this \",(0,t.jsx)(e.code,{children:\"fbm\"}),\" function and using the output of one as the coordinate input for the next (a technique known as \",(0,t.jsx)(e.strong,{children:\"Domain Warping\"}),\"), we created the illusion of deep, flowing fluid without ever writing a physics solver.\"]})]})}function d(n={}){let{wrapper:e}=n.components||{};return e?(0,t.jsx)(e,{...n,children:(0,t.jsx)(h,{...n})}):h(n)}return v(_);})();\n;return Component;"
+  },
+  {
     "title": "Fix memory leak in useEffect cleanup",
     "repo": "facebook/react",
     "prUrl": "https://github.com/facebook/react/pull/12345",
