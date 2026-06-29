@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { Text } from '@react-three/drei';
 import { useRouter } from 'next/navigation';
 import * as THREE from 'three';
 import { useGSAP } from '@gsap/react';
@@ -39,7 +40,7 @@ function ContributionRing({
   setHovered: (idx: number | null) => void;
   totalItems: number;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const router = useRouter();
   const localY = useRef(position[1]);
 
@@ -103,7 +104,7 @@ function ContributionRing({
   const targetZ = isHovered ? position[2] + 2 : position[2];
 
   useFrame((state, delta) => {
-    if (!meshRef.current) return;
+    if (!groupRef.current) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!prefersReducedMotion) {
@@ -119,24 +120,20 @@ function ContributionRing({
         localY.current -= totalSpan;
       }
 
-      meshRef.current.position.y = localY.current;
-      meshRef.current.position.x += (targetX - meshRef.current.position.x) * 10 * delta;
-      meshRef.current.position.z += (targetZ - meshRef.current.position.z) * 10 * delta;
+      groupRef.current.position.y = localY.current;
+      groupRef.current.position.x += (targetX - groupRef.current.position.x) * 10 * delta;
+      groupRef.current.position.z += (targetZ - groupRef.current.position.z) * 10 * delta;
     } else {
-      meshRef.current.position.y = localY.current;
-      meshRef.current.position.x = targetX;
-      meshRef.current.position.z = targetZ;
+      groupRef.current.position.y = localY.current;
+      groupRef.current.position.x = targetX;
+      groupRef.current.position.z = targetZ;
     }
   });
 
   return (
-    <mesh
-      ref={meshRef}
-      geometry={geometry}
-      material={material}
+    <group
+      ref={groupRef}
       position={position}
-      scale={1.2}
-      rotation={[-Math.PI / 2, 0, 0]} // Rotate to lie flat like a stack of coins
       onClick={() => {
         if (work) router.push(`/work/${work._meta.path}`);
       }}
@@ -151,7 +148,26 @@ function ContributionRing({
         setHovered(null);
         document.body.style.cursor = 'auto';
       }}
-    />
+    >
+      <mesh
+        geometry={geometry}
+        material={material}
+        scale={1.2}
+        rotation={[-Math.PI / 2, 0, 0]} // Rotate to lie flat like a stack of coins
+      />
+      {work && (
+        <Text
+          position={[0, 0, 2.4]}
+          fontSize={0.25}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          rotation={[0, 0, 0]}
+        >
+          {work.repo}
+        </Text>
+      )}
+    </group>
   );
 }
 
@@ -229,15 +245,6 @@ export default function RingField({
 
       {/* Overlay UI */}
       <div className="absolute right-12 bottom-12 flex flex-col items-end pointer-events-none">
-        {/* Hover Label */}
-        <div
-          className={`h-8 mb-8 transition-opacity duration-300 font-mono text-sm text-[var(--color-violet)] ${hoveredIndex !== null ? 'opacity-100' : 'opacity-0'}`}
-        >
-          {hoveredIndex !== null && currentWorks[hoveredIndex]
-            ? currentWorks[hoveredIndex].repo
-            : ''}
-        </div>
-
         {/* Pagination Controls */}
         <div className="flex items-center gap-4 pointer-events-auto bg-[var(--color-paper)]/80 backdrop-blur-sm px-4 py-2 rounded-full border border-[var(--color-hairline)]">
           <button
