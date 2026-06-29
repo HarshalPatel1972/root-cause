@@ -160,12 +160,12 @@ export default function RingField({
 }: {
   works: { _meta: { path: string }; repo: string }[];
 }) {
-  // Pad the works array to 15 items with nulls for decorative rings
-  const paddedWorks = Array.from({ length: 15 }).map((_, i) => works[i] || null);
+  // Pad the works array to 30 items with nulls for decorative rings
+  const paddedWorks = Array.from({ length: 30 }).map((_, i) => works[i] || null);
   const [page, setPage] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const itemsPerPage = 15;
+  const itemsPerPage = 30;
   const totalPages = Math.ceil(paddedWorks.length / itemsPerPage);
 
   const currentWorks = paddedWorks.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
@@ -196,9 +196,10 @@ export default function RingField({
           height: '100%',
           position: 'absolute',
           inset: 0,
-          maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
+          maskImage:
+            'linear-gradient(to bottom, transparent 15%, black 30%, black 70%, transparent 85%)',
           WebkitMaskImage:
-            'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
+            'linear-gradient(to bottom, transparent 15%, black 30%, black 70%, transparent 85%)',
         }}
       >
         <ambientLight intensity={1.5} />
