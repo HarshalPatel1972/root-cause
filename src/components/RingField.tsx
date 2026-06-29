@@ -15,12 +15,37 @@ function getRepoColors(repo: string) {
     'tailwindlabs/tailwindcss': { c1: '#38bdf8', c2: '#0ea5e9' },
     'microsoft/TypeScript': { c1: '#3178c6', c2: '#235a97' },
     'microsoft/vscode': { c1: '#0078d7', c2: '#005a9e' },
+    // Org-level colors
+    GetLantern: { c1: '#00B7E5', c2: '#008ba8' },
+    HashiCorp: { c1: '#555555', c2: '#000000' }, // Off-black gradient for black
+    StackExchange: { c1: '#F48024', c2: '#c96414' },
+    stretchr: { c1: '#6B7280', c2: '#4b5563' },
+    'gin-gonic': { c1: '#008ECF', c2: '#006594' },
+    'go-gitea': { c1: '#609926', c2: '#436e18' },
+    caddyserver: { c1: '#1F88C0', c2: '#135e85' },
+    'dgraph-io': { c1: '#E50695', c2: '#a8026c' },
+    'go-resty': { c1: '#7ACB8C', c2: '#57a168' },
+    containerd: { c1: '#333333', c2: '#111111' }, // Off-black gradient
+    argoproj: { c1: '#EF7B2D', c2: '#c45a16' },
+    magefile: { c1: '#4A90E2', c2: '#2c6cb5' },
+    harness: { c1: '#00B6FF', c2: '#0084ba' },
+    'fyne-io': { c1: '#1E88E5', c2: '#1362a8' },
+    'etcd-io': { c1: '#4196E1', c2: '#2c73b3' },
+    unjs: { c1: '#F4D03F', c2: '#cba726' },
+    triggerdotdev: { c1: '#A3E635', c2: '#7bb021' },
+    tscircuit: { c1: '#3B82F6', c2: '#2359b3' },
+    'kysely-org': { c1: '#333333', c2: '#111111' }, // Off-black gradient
+    'bombshell-dev': { c1: '#FF00B8', c2: '#bd0088' },
+    'LenovoLegionToolkit-Team': { c1: '#E2231A', c2: '#a8150d' },
   };
 
-  if (brandColors[repo]) {
+  const org = repo.split('/')[0];
+  const colorData = brandColors[repo] || brandColors[org];
+
+  if (colorData) {
     return {
-      color1: new THREE.Color(brandColors[repo].c1),
-      color2: new THREE.Color(brandColors[repo].c2),
+      color1: new THREE.Color(colorData.c1),
+      color2: new THREE.Color(colorData.c2),
     };
   }
 
