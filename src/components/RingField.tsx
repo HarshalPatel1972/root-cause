@@ -77,11 +77,12 @@ function ContributionRing({
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const router = useRouter();
-  const localY = useRef(position[1]);
+  const yPos = position[1];
+  const localY = useRef(yPos);
 
   useEffect(() => {
-    localY.current = position[1];
-  }, [position[1]]);
+    localY.current = yPos;
+  }, [yPos]);
 
   // Custom geometry with vertex colors based on repo name
   const geometry = useMemo(() => {
@@ -128,7 +129,7 @@ function ContributionRing({
 
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return geo;
-  }, [index, work?.repo]);
+  }, [index, work]);
 
   const material = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -182,6 +183,7 @@ function ContributionRing({
       {work && (
         <Text
           position={[0, 0, 2.3]}
+          // @ts-expect-error
           curveRadius={2.3}
           fontSize={0.4}
           fontWeight="bold"
@@ -190,18 +192,14 @@ function ContributionRing({
           anchorY="middle"
           rotation={[0, 0, 0]}
         >
-          {work.repo}
+          {work.repo.split('/').pop()}
         </Text>
       )}
     </group>
   );
 }
 
-export default function RingField({
-  works,
-}: {
-  works: { _meta: { path: string }; repo: string }[];
-}) {
+export default function RingField() {
   // Pad the works array to 30 items with mock repositories for decorative rings
   const mockRepos = [
     'GetLantern/lantern',
