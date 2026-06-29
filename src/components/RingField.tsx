@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect, Suspense } from 'react';
+import { useMemo, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { useRouter } from 'next/navigation';
@@ -69,11 +69,13 @@ function ContributionRing({
   position,
   index,
   totalItems,
+  scrollState,
 }: {
   work: { _meta: { path: string }; repo: string } | null;
   position: [number, number, number];
   index: number;
   totalItems: number;
+  scrollState: React.MutableRefObject<{ velocity: number; isDragging: boolean; lastY: number }>;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const router = useRouter();
@@ -144,8 +146,8 @@ function ContributionRing({
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!prefersReducedMotion) {
-      // Continuous upward motion
-      localY.current += 1.0 * delta;
+      // Continuous motion driven by shared velocity
+      localY.current += scrollState.current.velocity * delta;
 
       // Wrap around logic
       const gap = 1.5;
@@ -154,6 +156,8 @@ function ContributionRing({
 
       if (localY.current > maxBound) {
         localY.current -= totalSpan;
+      } else if (localY.current < -maxBound) {
+        localY.current += totalSpan;
       }
 
       groupRef.current.position.y = localY.current;
@@ -233,14 +237,52 @@ export default function RingField() {
       repo: mockRepos[i % mockRepos.length],
     };
   });
-  const [page, setPage] = useState(0);
 
-  const itemsPerPage = 30;
-  const totalPages = Math.ceil(paddedWorks.length / itemsPerPage);
+  const scrollState = useRef({ velocity: 1.0, isDragging: false, lastY: 0 });
 
-  const currentWorks = paddedWorks.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+  const handlePointerDown = (e: React.PointerEvent) => {
+    scrollState.current.isDragging = true;
+    scrollState.current.lastY = e.clientY;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!scrollState.current.isDragging) return;
+    const deltaY = scrollState.current.lastY - e.clientY;
+    scrollState.current.lastY = e.clientY;
+    
+    // Convert pixel delta to velocity (adjust multiplier for feel)
+    // Upward drag -> positive deltaY -> positive velocity
+    scrollState.current.velocity = deltaY * 2.0; 
+  };
+
+  const handlePointerUp = () => {
+    scrollState.current.isDragging = false;
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    // Wheel deltaY is positive when scrolling down (content moves up)
+    scrollState.current.velocity = e.deltaY * 0.1;
+  };
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // A small inner component to handle the friction/decay of scroll velocity
+  const ScrollFriction = () => {
+    useFrame((state, delta) => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) return;
+      
+      if (!scrollState.current.isDragging) {
+        // Gently lerp back to default speed (1.0)
+        scrollState.current.velocity = THREE.MathUtils.lerp(
+          scrollState.current.velocity,
+          1.0,
+          5.0 * delta
+        );
+      }
+    });
+    return null;
+  };
 
   useGSAP(
     () => {
@@ -257,7 +299,15 @@ export default function RingField() {
   );
 
   return (
-    <div className="w-full h-full relative" ref={containerRef}>
+    <div 
+      className="w-full h-full relative touch-none" 
+      ref={containerRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      onWheel={handleWheel}
+    >
       {/* 3D Canvas */}
       <Canvas
         camera={{ position: [0, 0, 100], fov: 10 }}
@@ -276,12 +326,13 @@ export default function RingField() {
         <directionalLight position={[10, 10, 5]} intensity={2} />
         <directionalLight position={[-10, -10, -5]} intensity={0.5} />
 
+        <ScrollFriction />
         <Suspense fallback={null}>
-          {currentWorks.map((work, idx) => {
+          {paddedWorks.map((work, idx) => {
             // Vertical column stacking on the right side
             const xOffset = 8.0;
             // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 1.5)
-            const yOffset = (idx - (currentWorks.length - 1) / 2) * 1.5;
+            const yOffset = (idx - (paddedWorks.length - 1) / 2) * 1.5;
             const zOffset = 0;
 
             return (
@@ -290,45 +341,13 @@ export default function RingField() {
                 work={work}
                 index={idx}
                 position={[xOffset, yOffset, zOffset]}
-                totalItems={currentWorks.length}
+                totalItems={paddedWorks.length}
+                scrollState={scrollState}
               />
             );
           })}
         </Suspense>
       </Canvas>
-
-      {/* Overlay UI */}
-      <div className="absolute right-12 bottom-12 flex flex-col items-end pointer-events-none">
-        {/* Pagination Controls */}
-        <div className="flex items-center gap-4 pointer-events-auto bg-[var(--color-paper)]/80 backdrop-blur-sm px-4 py-2 rounded-full border border-[var(--color-hairline)]">
-          <button
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-            className="w-8 h-8 flex items-center justify-center text-[var(--color-mist)] disabled:opacity-30 hover:text-[var(--color-ink)] transition-colors"
-            aria-label="Previous page"
-          >
-            ←
-          </button>
-
-          <div className="flex gap-2">
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-2 h-2 rounded-full transition-colors ${i === page ? 'bg-[var(--color-ink)]' : 'bg-[var(--color-hairline)]'}`}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-            disabled={page === totalPages - 1}
-            className="w-8 h-8 flex items-center justify-center text-[var(--color-mist)] disabled:opacity-30 hover:text-[var(--color-ink)] transition-colors"
-            aria-label="Next page"
-          >
-            →
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

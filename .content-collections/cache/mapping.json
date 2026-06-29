@@ -1,10 +1,1 @@
-{
-  "works": {
-    "nextjs-image-lcp": ["24e0cd729c0ad97bb9b354cd154f38e32ee187fca5a2ff08cb2beaad23d8e1c3"],
-    "node-stream-fix": ["3c8167c2402a943e976ccda3c540b21d5d67ca2cdd0bae9b17d5078011178949"],
-    "react-memory-leak": ["6dd67b193133901ae48eb5549df170a09f0bf2d588d54dd681151e9854c53055"],
-    "tailwind-safelist": ["e27718eb137746430ba8f48c197b0f3428b63b2bff6ec73f0695d2715b1d3b8c"],
-    "typescript-inference": ["4be0b6f0b3d3c2c3e3a81ec2e33a823ccefc5e4ac0f7483bbe1e2d7489d3ba78"],
-    "vscode-extension-crash": ["2fd92a4cdf3e31bc74758ff0ee798d2693dd898f62513a555a03d55d29c373e1"]
-  }
-}
+{"works":{"nextjs-image-lcp":["24e0cd729c0ad97bb9b354cd154f38e32ee187fca5a2ff08cb2beaad23d8e1c3"],"node-stream-fix":["3c8167c2402a943e976ccda3c540b21d5d67ca2cdd0bae9b17d5078011178949"],"react-memory-leak":["6dd67b193133901ae48eb5549df170a09f0bf2d588d54dd681151e9854c53055"],"tailwind-safelist":["e27718eb137746430ba8f48c197b0f3428b63b2bff6ec73f0695d2715b1d3b8c"],"typescript-inference":["4be0b6f0b3d3c2c3e3a81ec2e33a823ccefc5e4ac0f7483bbe1e2d7489d3ba78"],"vscode-extension-crash":["2fd92a4cdf3e31bc74758ff0ee798d2693dd898f62513a555a03d55d29c373e1"]}}

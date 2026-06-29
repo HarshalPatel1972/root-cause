@@ -44,7 +44,7 @@ export default function Home() {
 
       {/* 3D WebGL Canvas Layer */}
       <div className="absolute inset-0 z-10 pointer-events-auto" aria-hidden="true">
-        <ClientRingField works={sortedWorks} />
+        <ClientRingField />
       </div>
     </div>
   );
