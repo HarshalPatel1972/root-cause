@@ -71,7 +71,7 @@ function getTextColor(hex: string): string {
 // ── Disk constants ─────────────────────────────────────────────────
 const DISK_OUTER_RADIUS = 2.0;
 const DISK_INNER_RADIUS = 0.0; // Solid disk, no hole — reads better as a "puck"
-const DISK_HEIGHT = 0.5;
+const DISK_HEIGHT = 0.75;
 const GAP = 1.8;
 const TOTAL_ITEMS = 30;
 const TOTAL_SPAN = TOTAL_ITEMS * GAP;
