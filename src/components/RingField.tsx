@@ -75,16 +75,10 @@ function ContributionRing({
   position: [number, number, number];
   index: number;
   totalItems: number;
-  scrollState: React.MutableRefObject<{ velocity: number; isDragging: boolean; lastY: number }>;
+  scrollState: React.MutableRefObject<{ offset: number }>;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const router = useRouter();
-  const yPos = position[1];
-  const localY = useRef(yPos);
-
-  useEffect(() => {
-    localY.current = yPos;
-  }, [yPos]);
 
   // Custom geometry with vertex colors based on repo name
   const geometry = useMemo(() => {
@@ -141,30 +135,30 @@ function ContributionRing({
     });
   }, []);
 
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (!groupRef.current) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const gap = 1.5;
+    const totalSpan = totalItems * gap;
+    const halfSpan = totalSpan / 2;
+
     if (!prefersReducedMotion) {
-      // Continuous motion driven by shared velocity
-      localY.current += scrollState.current.velocity * delta;
+      // Calculate absolute baseline y based on index
+      const baseOffset = (index - (totalItems - 1) / 2) * gap;
+      
+      // Apply the global smooth scroll offset
+      let y = baseOffset + scrollState.current.offset;
 
-      // Wrap around logic
-      const gap = 1.5;
-      const totalSpan = totalItems * gap;
-      const maxBound = totalSpan / 2;
+      // Wrap y smoothly within [-halfSpan, halfSpan]
+      y = (((y + halfSpan) % totalSpan) + totalSpan) % totalSpan - halfSpan;
 
-      if (localY.current > maxBound) {
-        localY.current -= totalSpan;
-      } else if (localY.current < -maxBound) {
-        localY.current += totalSpan;
-      }
-
-      groupRef.current.position.y = localY.current;
+      groupRef.current.position.y = y;
       groupRef.current.position.x = position[0];
       groupRef.current.position.z = position[2];
     } else {
-      groupRef.current.position.y = localY.current;
+      const baseOffset = (index - (totalItems - 1) / 2) * gap;
+      groupRef.current.position.y = baseOffset;
       groupRef.current.position.x = position[0];
       groupRef.current.position.z = position[2];
     }
@@ -238,11 +232,18 @@ export default function RingField() {
     };
   });
 
-  const scrollState = useRef({ velocity: 1.0, isDragging: false, lastY: 0 });
+  const scrollState = useRef({ 
+    offset: 0, 
+    targetOffset: 0, 
+    isDragging: false, 
+    lastY: 0, 
+    dragVelocity: 0 
+  });
 
   const handlePointerDown = (e: React.PointerEvent) => {
     scrollState.current.isDragging = true;
     scrollState.current.lastY = e.clientY;
+    scrollState.current.dragVelocity = 0;
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -250,18 +251,21 @@ export default function RingField() {
     const deltaY = scrollState.current.lastY - e.clientY;
     scrollState.current.lastY = e.clientY;
     
-    // Convert pixel delta to velocity (adjust multiplier for feel)
-    // Upward drag -> positive deltaY -> positive velocity
-    scrollState.current.velocity = deltaY * 2.0; 
+    // Upward drag -> positive deltaY
+    const moveAmount = deltaY * 0.05;
+    scrollState.current.targetOffset += moveAmount;
+    scrollState.current.dragVelocity = moveAmount; // Capture momentum
   };
 
   const handlePointerUp = () => {
     scrollState.current.isDragging = false;
+    // Apply throw momentum when letting go
+    scrollState.current.targetOffset += scrollState.current.dragVelocity * 10.0;
   };
 
   const handleWheel = (e: React.WheelEvent) => {
-    // Wheel deltaY is positive when scrolling down (content moves up)
-    scrollState.current.velocity = e.deltaY * 0.1;
+    // Wheel deltaY is positive when scrolling down (pulling content up)
+    scrollState.current.targetOffset += e.deltaY * 0.01;
   };
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -270,16 +274,22 @@ export default function RingField() {
   const ScrollFriction = () => {
     useFrame((state, delta) => {
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReducedMotion) return;
-      
-      if (!scrollState.current.isDragging) {
-        // Gently lerp back to default speed (1.0)
-        scrollState.current.velocity = THREE.MathUtils.lerp(
-          scrollState.current.velocity,
-          1.0,
-          5.0 * delta
-        );
+      if (prefersReducedMotion) {
+        scrollState.current.offset += 1.0 * delta;
+        return;
       }
+      
+      // Auto-scroll constant upward drift
+      if (!scrollState.current.isDragging) {
+        scrollState.current.targetOffset += 1.0 * delta;
+      }
+      
+      // Smoothly interpolate current offset towards targetOffset (handles dragging and momentum)
+      scrollState.current.offset = THREE.MathUtils.lerp(
+        scrollState.current.offset,
+        scrollState.current.targetOffset,
+        8.0 * delta
+      );
     });
     return null;
   };
