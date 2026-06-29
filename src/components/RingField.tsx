@@ -69,10 +69,14 @@ function ContributionRing({
     const count = geo.attributes.position.count;
     const colors = new Float32Array(count * 3);
 
-    const hue1 = (index * 12) % 360;
-    const hue2 = (hue1 + 40) % 360;
-    const color1 = new THREE.Color().setHSL(hue1 / 360, 0.8, 0.6);
-    const color2 = new THREE.Color().setHSL(hue2 / 360, 0.8, 0.4);
+    let color1 = new THREE.Color().setHSL(((index * 12) % 360) / 360, 0.8, 0.6);
+    let color2 = new THREE.Color().setHSL(((index * 12 + 40) % 360) / 360, 0.8, 0.4);
+
+    if (work && work.repo) {
+      const repoColors = getRepoColors(work.repo);
+      color1 = repoColors.color1;
+      color2 = repoColors.color2;
+    }
 
     for (let i = 0; i < count; i++) {
       const y = geo.attributes.position.getY(i);
@@ -89,7 +93,7 @@ function ContributionRing({
 
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return geo;
-  }, [index]);
+  }, [index, work?.repo]);
 
   const material = useMemo(() => {
     return new THREE.MeshStandardMaterial({
