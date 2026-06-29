@@ -181,19 +181,21 @@ function ContributionRing({
         rotation={[-Math.PI / 2, 0, 0]} // Rotate to lie flat like a stack of coins
       />
       {work && (
-        <Text
-          position={[0, 0, 2.3]}
-          // @ts-expect-error
-          curveRadius={2.3}
-          fontSize={0.4}
-          fontWeight="bold"
-          color="white"
-          anchorX="center"
-          anchorY="middle"
-          rotation={[0, 0, 0]}
-        >
-          {work.repo.split('/').pop()}
-        </Text>
+        <group rotation={[0, -0.08, 0]}>
+          <Text
+            position={[0, 0, 2.3]}
+            // @ts-expect-error
+            curveRadius={2.3}
+            fontSize={0.4}
+            fontWeight="bold"
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+            rotation={[0, 0, 0]}
+          >
+            {work.repo.split('/').pop()}
+          </Text>
+        </group>
       )}
     </group>
   );
