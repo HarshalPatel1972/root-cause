@@ -11,8 +11,9 @@ export function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const work = allWorks.find((w) => w._meta.path === params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const work = allWorks.find((w) => w._meta.path === resolvedParams.slug);
   if (!work) return {};
 
   return {
@@ -21,8 +22,9 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   };
 }
 
-export default function WorkPage({ params }: { params: { slug: string } }) {
-  const work = allWorks.find((w) => w._meta.path === params.slug);
+export default async function WorkPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const work = allWorks.find((w) => w._meta.path === resolvedParams.slug);
 
   if (!work) {
     notFound();
