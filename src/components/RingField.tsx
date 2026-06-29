@@ -186,8 +186,7 @@ function ContributionDisk({
       groupRef.current.position.x = position[0];
       groupRef.current.position.z = position[2];
 
-      // Subtle idle micro-rotation around the Y axis (vertical axis of the disk)
-      groupRef.current.rotation.y = rotationOffset + state.clock.elapsedTime * 0.08;
+      groupRef.current.rotation.y = 0;
     } else {
       const baseOffset = (index - (TOTAL_ITEMS - 1) / 2) * GAP;
       groupRef.current.position.y = baseOffset;
@@ -230,19 +229,17 @@ function ContributionDisk({
       */}
 
       {/* Repo name on the front face */}
-      <group rotation={[0, -0.08, 0]}>
-        <Text
-          position={[0, 0, DISK_OUTER_RADIUS * 1.21]}
-          fontSize={0.35}
-          fontWeight="bold"
-          color={textColor}
-          anchorX="center"
-          anchorY="middle"
-          rotation={[0, 0, 0]}
-        >
-          {repoName}
-        </Text>
-      </group>
+      <Text
+        position={[0, 0, DISK_OUTER_RADIUS * 1.21]}
+        fontSize={0.35}
+        fontWeight="bold"
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        rotation={[0, 0, 0]}
+      >
+        {repoName}
+      </Text>
     </group>
   );
 }
