@@ -158,7 +158,8 @@ function ContributionRing({
       {work && (
         <Text
           position={[0, 0, 2.4]}
-          fontSize={0.25}
+          fontSize={0.4}
+          fontWeight="bold"
           color="white"
           anchorX="center"
           anchorY="middle"
