@@ -207,7 +207,8 @@ function ContributionDisk({
       position={position}
       visible={false}
       onClick={() => {
-        if (work) router.push(`/work/${work._meta.path}`);
+        // Route every disk click to the same known working page, as requested
+        router.push(`/work/react-memory-leak`);
       }}
     >
       {/* The puck — cylinder with separate materials for top, side, bottom */}
