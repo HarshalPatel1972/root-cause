@@ -247,7 +247,6 @@ export default function RingField({
   ];
 
   const paddedWorks = Array.from({ length: 30 }).map((_, i) => {
-    if (works[i]) return works[i];
     return {
       _meta: { path: `mock-${i}` },
       repo: mockRepos[i % mockRepos.length],
