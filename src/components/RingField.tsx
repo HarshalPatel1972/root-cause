@@ -274,7 +274,7 @@ function FrameNumber({
         anchorX="right"
         anchorY="middle"
       >
-        {`#${index % 21}`}
+        {`#${index + 1}`}
       </Text>
     </group>
   );
