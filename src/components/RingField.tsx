@@ -159,6 +159,9 @@ function ContributionDisk({
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
+    
+    // Cap delta at 100ms so tab switching doesn't cause huge time jumps
+    const safeDelta = Math.min(delta, 0.1);
 
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
@@ -168,7 +171,7 @@ function ContributionDisk({
 
     // Staggered entrance
     if (!enteredRef.current) {
-      enterTimeRef.current += delta;
+      enterTimeRef.current += safeDelta;
       const delay = index * 0.04; // 40ms stagger per disk
       if (enterTimeRef.current < delay) {
         groupRef.current.visible = false;
@@ -303,22 +306,25 @@ function ScrollController({
   }>;
 }) {
   useFrame((state, delta) => {
+    // Cap delta at 100ms so tab switching doesn't cause huge time jumps
+    const safeDelta = Math.min(delta, 0.1);
+
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
     if (prefersReducedMotion) {
-      scrollState.current.offset += 1.0 * delta;
+      scrollState.current.offset += 1.0 * safeDelta;
       return;
     }
 
     // Auto-scroll constant upward drift (always applies)
-    scrollState.current.targetOffset += 1.0 * delta;
+    scrollState.current.targetOffset += 1.0 * safeDelta;
 
     // Smoothly interpolate current offset towards targetOffset
     scrollState.current.offset = THREE.MathUtils.lerp(
       scrollState.current.offset,
       scrollState.current.targetOffset,
-      4.0 * delta
+      4.0 * safeDelta
     );
   });
   return null;
