@@ -56,9 +56,10 @@ function getRepoColors(repo: string) {
   }
   const hue1 = Math.abs(hash) % 360;
   const hue2 = (hue1 + 40) % 360;
-  const color1 = new THREE.Color().setHSL(hue1 / 360, 0.8, 0.6);
-  const color2 = new THREE.Color().setHSL(hue2 / 360, 0.8, 0.4);
-  return { color1, color2, hex: `hsl(${hue1}, 80%, 60%)` };
+  // Maximum saturation and optimal lightness for vivid true HD colors
+  const color1 = new THREE.Color().setHSL(hue1 / 360, 1.0, 0.5);
+  const color2 = new THREE.Color().setHSL(hue2 / 360, 1.0, 0.4);
+  return { color1, color2, hex: `hsl(${hue1}, 100%, 50%)` };
 }
 
 // ── Luminance-based text color ─────────────────────────────────────
@@ -98,7 +99,7 @@ function ContributionDisk({
   const rotationOffset = useMemo(() => (index * 137.5 * Math.PI) / 180, [index]);
 
   const { topMaterial, sideMaterial, bottomMaterial, textColor } = useMemo(() => {
-    let color1 = new THREE.Color().setHSL(((index * 12) % 360) / 360, 0.8, 0.6);
+    let color1 = new THREE.Color().setHSL(((index * 12) % 360) / 360, 1.0, 0.5);
     let hex = '#888888';
 
     if (work && work.repo) {

@@ -105,24 +105,24 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 grid-rows-4 lg:grid-rows-2 gap-4 p-4 min-h-0 overflow-y-auto lg:overflow-hidden">
         
         {/* Quadrant 1: The Issue */}
-        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+        <section className="bg-gradient-to-br from-rose-500/10 to-orange-500/10 border-2 border-rose-500/30 rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col shadow-[0_0_15px_rgba(244,63,94,0.15)] transition-all hover:shadow-[0_0_25px_rgba(244,63,94,0.25)]">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-rose-600 font-bold mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
             1. The issue
           </h2>
           <p className="text-base leading-relaxed flex-1">{work.issue}</p>
         </section>
 
         {/* Quadrant 2: Root Cause */}
-        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-violet)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+        <section className="bg-gradient-to-br from-fuchsia-500/10 to-purple-500/10 border-2 border-fuchsia-500/30 rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col shadow-[0_0_15px_rgba(217,70,239,0.15)] transition-all hover:shadow-[0_0_25px_rgba(217,70,239,0.25)]">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-fuchsia-600 font-bold mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
             2. Root cause
           </h2>
           <p className="text-base leading-relaxed font-medium flex-1">{work.rootCause}</p>
         </section>
 
         {/* Quadrant 3: The Plan */}
-        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+        <section className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-2 border-blue-500/30 rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all hover:shadow-[0_0_25px_rgba(59,130,246,0.25)]">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-blue-600 font-bold mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
             3. The plan
           </h2>
           <p className="text-base leading-relaxed flex-1">{work.plan}</p>
@@ -138,8 +138,8 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
         </section>
 
         {/* Quadrant 4: The Fix */}
-        <section className="bg-white/5 border border-[var(--color-hairline)] rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-mist)] mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
+        <section className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-2 border-emerald-500/30 rounded-xl p-6 overflow-y-auto custom-scrollbar flex flex-col shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all hover:shadow-[0_0_25px_rgba(16,185,129,0.25)]">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-emerald-600 font-bold mb-4 flex-none sticky top-0 bg-[var(--color-paper)]/90 backdrop-blur pb-2 z-10">
             4. The fix
           </h2>
           <div className="flex-1 space-y-6">
