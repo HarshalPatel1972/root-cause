@@ -92,7 +92,7 @@ function ContributionRing({
   }, []);
 
   // Target position and rotation for animation
-  const targetY = isHovered ? position[1] + 1 : position[1];
+  const targetX = isHovered ? position[0] - 1.5 : position[0];
   const targetZ = isHovered ? position[2] + 2 : position[2];
 
   useFrame((state, delta) => {
@@ -101,10 +101,10 @@ function ContributionRing({
     // Hover lift easing
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!prefersReducedMotion) {
-      meshRef.current.position.y += (targetY - meshRef.current.position.y) * 10 * delta;
+      meshRef.current.position.x += (targetX - meshRef.current.position.x) * 10 * delta;
       meshRef.current.position.z += (targetZ - meshRef.current.position.z) * 10 * delta;
     } else {
-      meshRef.current.position.y = targetY;
+      meshRef.current.position.x = targetX;
       meshRef.current.position.z = targetZ;
     }
   });
@@ -115,7 +115,7 @@ function ContributionRing({
       geometry={geometry}
       material={material}
       position={position}
-      rotation={[0, -Math.PI / 2, 0]} // Angled completely sideways so thickness is exactly 0.8
+      rotation={[-Math.PI / 2, 0, 0]} // Rotate to lie flat like a stack of coins
       onClick={() => {
         if (work) router.push(`/work/${work._meta.path}`);
       }}
@@ -177,8 +177,10 @@ export default function RingField({
         <directionalLight position={[-10, -10, -5]} intensity={0.5} />
 
         {currentWorks.map((work, idx) => {
-          // Horizontal row stacking, packed tightly face-to-face
-          const xOffset = (idx - (currentWorks.length - 1) / 2) * 0.9;
+          // Vertical column stacking on the right side
+          const xOffset = 5.0;
+          // Invert yOffset so idx=0 is near the top
+          const yOffset = -((idx - (currentWorks.length - 1) / 2) * 0.9);
           const zOffset = 0;
 
           return (
@@ -186,7 +188,7 @@ export default function RingField({
               key={work ? work._meta.path : `empty-${idx}`}
               work={work}
               index={idx}
-              position={[xOffset, -1.0, zOffset]} // Raised Y to not clip off screen
+              position={[xOffset, yOffset, zOffset]}
               isHovered={hoveredIndex === idx}
               setHovered={setHoveredIndex}
             />
@@ -195,7 +197,7 @@ export default function RingField({
       </Canvas>
 
       {/* Overlay UI */}
-      <div className="absolute inset-x-0 bottom-12 flex flex-col items-center pointer-events-none">
+      <div className="absolute right-12 bottom-12 flex flex-col items-end pointer-events-none">
         {/* Hover Label */}
         <div
           className={`h-8 mb-8 transition-opacity duration-300 font-mono text-sm text-[var(--color-violet)] ${hoveredIndex !== null ? 'opacity-100' : 'opacity-0'}`}

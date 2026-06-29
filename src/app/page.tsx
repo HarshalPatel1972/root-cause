@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Hero text */}
-      <div className="absolute top-12 left-12 z-20 pointer-events-none">
+      <div className="absolute top-1/2 -translate-y-1/2 left-12 z-20 pointer-events-none">
         <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight text-[var(--color-ink)] max-w-2xl mb-4 pointer-events-auto">
           I read other people&apos;s stack traces for fun.
         </h1>
