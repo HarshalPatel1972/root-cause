@@ -281,14 +281,14 @@ function FrameNumber({
 }
 
 // ── Spine line (vertical bar through the disk column) ──────────────
-function SpineLine() {
-  return (
-    <mesh position={[8.0, 0, -0.5]}>
-      <boxGeometry args={[0.02, TOTAL_SPAN * 1.2, 0.02]} />
-      <meshBasicMaterial color="#ececef" transparent opacity={0.5} />
-    </mesh>
-  );
-}
+// function SpineLine() {
+//   return (
+//     <mesh position={[8.0, 0, -0.5]}>
+//       <boxGeometry args={[0.02, TOTAL_SPAN * 1.2, 0.02]} />
+//       <meshBasicMaterial color="#ececef" transparent opacity={0.5} />
+//     </mesh>
+//   );
+// }
 
 // ── Scroll friction controller ─────────────────────────────────────
 function ScrollController({
@@ -443,8 +443,8 @@ export default function RingField() {
 
         <ScrollController scrollState={scrollState} />
 
-        {/* Spine line through the column */}
-        <SpineLine />
+        {/* Spine line through the column (removed) */}
+        {/* <SpineLine /> */}
 
         <Suspense fallback={null}>
           {paddedWorks.map((work, idx) => {
