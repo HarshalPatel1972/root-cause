@@ -30,6 +30,7 @@ function ContributionRing({
   index,
   isHovered,
   setHovered,
+  totalItems,
 }: {
   work: { _meta: { path: string }; repo: string } | null;
   position: [number, number, number];
