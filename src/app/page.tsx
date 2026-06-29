@@ -66,18 +66,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Vertical margin label — rotated text on the left edge */}
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
-        <span
-          className="font-mono text-[10px] text-[var(--color-hairline)] uppercase tracking-[0.3em] block"
-          style={{
-            writingMode: 'vertical-lr',
-            transform: 'rotate(180deg)',
-          }}
-        >
-          [ stack ]
-        </span>
-      </div>
+
 
       {/* Accessible fallback link list (visually hidden but focusable) */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
