@@ -221,8 +221,38 @@ export default function RingField({
 }: {
   works: { _meta: { path: string }; repo: string }[];
 }) {
-  // Pad the works array to 30 items with nulls for decorative rings
-  const paddedWorks = Array.from({ length: 30 }).map((_, i) => works[i] || null);
+  // Pad the works array to 30 items with mock repositories for decorative rings
+  const mockRepos = [
+    'GetLantern/lantern',
+    'HashiCorp/terraform',
+    'StackExchange/dns',
+    'stretchr/testify',
+    'gin-gonic/gin',
+    'go-gitea/gitea',
+    'caddyserver/caddy',
+    'dgraph-io/dgraph',
+    'go-resty/resty',
+    'containerd/containerd',
+    'argoproj/argo-cd',
+    'magefile/mage',
+    'harness/harness',
+    'fyne-io/fyne',
+    'etcd-io/etcd',
+    'unjs/nitro',
+    'triggerdotdev/trigger.dev',
+    'tscircuit/tscircuit',
+    'kysely-org/kysely',
+    'bombshell-dev/bombshell',
+    'LenovoLegionToolkit-Team/LenovoLegionToolkit',
+  ];
+
+  const paddedWorks = Array.from({ length: 30 }).map((_, i) => {
+    if (works[i]) return works[i];
+    return {
+      _meta: { path: `mock-${i}` },
+      repo: mockRepos[i % mockRepos.length],
+    };
+  });
   const [page, setPage] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
