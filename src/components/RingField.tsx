@@ -106,6 +106,9 @@ function ContributionDisk({
       hex = repoColors.hex;
     }
 
+    // Make the base color more diffused (lower saturation, slightly lighter)
+    color1.offsetHSL(0, -0.3, 0.1);
+
     // Top face — lighter, catches highlight
     const topColor = color1.clone();
     topColor.offsetHSL(0, -0.05, 0.12);
@@ -119,20 +122,20 @@ function ContributionDisk({
 
     const topMat = new THREE.MeshStandardMaterial({
       color: topColor,
-      roughness: 0.3,
-      metalness: 0.15,
+      roughness: 0.8,
+      metalness: 0.05,
     });
 
     const sideMat = new THREE.MeshStandardMaterial({
       color: sideColor,
-      roughness: 0.4,
-      metalness: 0.1,
+      roughness: 0.9,
+      metalness: 0.0,
     });
 
     const bottomMat = new THREE.MeshStandardMaterial({
       color: bottomColor,
-      roughness: 0.6,
-      metalness: 0.05,
+      roughness: 0.9,
+      metalness: 0.0,
     });
 
     return {
