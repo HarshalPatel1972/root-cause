@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { useRouter } from 'next/navigation';
@@ -222,25 +222,27 @@ export default function RingField({
         <directionalLight position={[10, 10, 5]} intensity={2} />
         <directionalLight position={[-10, -10, -5]} intensity={0.5} />
 
-        {currentWorks.map((work, idx) => {
-          // Vertical column stacking on the right side
-          const xOffset = 8.0;
-          // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 1.1)
-          const yOffset = (idx - (currentWorks.length - 1) / 2) * 1.1;
-          const zOffset = 0;
+        <Suspense fallback={null}>
+          {currentWorks.map((work, idx) => {
+            // Vertical column stacking on the right side
+            const xOffset = 8.0;
+            // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 1.1)
+            const yOffset = (idx - (currentWorks.length - 1) / 2) * 1.1;
+            const zOffset = 0;
 
-          return (
-            <ContributionRing
-              key={work ? work._meta.path : `empty-${idx}`}
-              work={work}
-              index={idx}
-              position={[xOffset, yOffset, zOffset]}
-              isHovered={hoveredIndex === idx}
-              setHovered={setHoveredIndex}
-              totalItems={currentWorks.length}
-            />
-          );
-        })}
+            return (
+              <ContributionRing
+                key={work ? work._meta.path : `empty-${idx}`}
+                work={work}
+                index={idx}
+                position={[xOffset, yOffset, zOffset]}
+                isHovered={hoveredIndex === idx}
+                setHovered={setHoveredIndex}
+                totalItems={currentWorks.length}
+              />
+            );
+          })}
+        </Suspense>
       </Canvas>
 
       {/* Overlay UI */}
