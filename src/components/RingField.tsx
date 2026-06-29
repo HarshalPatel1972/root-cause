@@ -111,7 +111,7 @@ function ContributionRing({
       localY.current += 1.0 * delta;
 
       // Wrap around logic
-      const gap = 0.65;
+      const gap = 1.1;
       const totalSpan = totalItems * gap;
       const maxBound = totalSpan / 2;
 
@@ -135,7 +135,7 @@ function ContributionRing({
       geometry={geometry}
       material={material}
       position={position}
-      scale={0.7}
+      scale={1.2}
       rotation={[-Math.PI / 2, 0, 0]} // Rotate to lie flat like a stack of coins
       onClick={() => {
         if (work) router.push(`/work/${work._meta.path}`);
@@ -209,8 +209,8 @@ export default function RingField({
         {currentWorks.map((work, idx) => {
           // Vertical column stacking on the right side
           const xOffset = 8.0;
-          // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 0.65)
-          const yOffset = (idx - (currentWorks.length - 1) / 2) * 0.65;
+          // Normal yOffset so idx=0 is at the bottom and they build upwards (gap 1.1)
+          const yOffset = (idx - (currentWorks.length - 1) / 2) * 1.1;
           const zOffset = 0;
 
           return (
