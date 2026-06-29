@@ -186,7 +186,10 @@ function ContributionDisk({
       groupRef.current.position.x = position[0];
       groupRef.current.position.z = position[2];
 
-      groupRef.current.rotation.y = 0;
+      // Perspective correction: since disks are at x=8 and camera is at x=0, z=100,
+      // we rotate the disk slightly (-0.08 rad) so it faces the camera perfectly.
+      // This stops the text from looking like it's aligned to the right.
+      groupRef.current.rotation.y = -0.08;
     } else {
       const baseOffset = (index - (TOTAL_ITEMS - 1) / 2) * GAP;
       groupRef.current.position.y = baseOffset;
