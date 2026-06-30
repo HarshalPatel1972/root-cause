@@ -75,7 +75,7 @@ const DISK_OUTER_RADIUS = 2.0;
 const DISK_INNER_RADIUS = 0.0; // Solid disk, no hole — reads better as a "puck"
 const DISK_HEIGHT = 0.75;
 const GAP = 1.8;
-const TOTAL_ITEMS = 196;
+const TOTAL_ITEMS = 37;
 const TOTAL_SPAN = TOTAL_ITEMS * GAP;
 
 // ── A single 3D disk (hockey puck / poker chip) ────────────────────
@@ -374,15 +374,16 @@ export default function RingField() {
   ];
 
   const paddedWorks = useMemo(() => {
-    const sortedWorks = [...allWorks].sort(
-      (a, b) => new Date(a.dateCompleted).getTime() - new Date(b.dateCompleted).getTime()
-    );
-
-    return Array.from({ length: TOTAL_ITEMS }).map((_, i) => {
-      if (i < sortedWorks.length) return sortedWorks[i];
+    // Return exactly 1 disk per unique repo from our 37-item list
+    return mockRepos.map((repo, i) => {
+      // If we have real MDX content for this repo, use it so it's clickable
+      const realWork = allWorks.find((w) => w.repo === repo);
+      if (realWork) return realWork;
+      
+      // Otherwise render a visual placeholder disk
       return {
         _meta: { path: `mock-${i}` },
-        repo: mockRepos[i % mockRepos.length],
+        repo: repo,
       };
     });
   }, []);
