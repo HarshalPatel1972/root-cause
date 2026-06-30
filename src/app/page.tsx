@@ -28,17 +28,17 @@ export default function Home() {
       <div className="absolute bottom-8 left-12 z-20 pointer-events-none">
         <div className="flex items-center gap-6 font-mono text-xs text-[var(--color-mist)] tracking-wider">
           <span>
-            <span className="text-[var(--color-ink)] font-medium text-sm">{sortedWorks.length}</span>{' '}
+            <span className="text-[var(--color-ink)] font-medium text-sm">196</span>{' '}
             PRs merged
           </span>
           <span className="text-[var(--color-hairline)]">·</span>
           <span>
-            <span className="text-[var(--color-ink)] font-medium text-sm">{uniqueRepos.size}</span>{' '}
+            <span className="text-[var(--color-ink)] font-medium text-sm">37</span>{' '}
             repos touched
           </span>
           <span className="text-[var(--color-hairline)]">·</span>
           <span>
-            <span className="text-[var(--color-ink)] font-medium text-sm">21</span>{' '}
+            <span className="text-[var(--color-ink)] font-medium text-sm">30+</span>{' '}
             orgs
           </span>
         </div>

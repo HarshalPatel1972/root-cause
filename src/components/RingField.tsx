@@ -75,7 +75,7 @@ const DISK_OUTER_RADIUS = 2.0;
 const DISK_INNER_RADIUS = 0.0; // Solid disk, no hole — reads better as a "puck"
 const DISK_HEIGHT = 0.75;
 const GAP = 1.8;
-const TOTAL_ITEMS = 30;
+const TOTAL_ITEMS = 196;
 const TOTAL_SPAN = TOTAL_ITEMS * GAP;
 
 // ── A single 3D disk (hockey puck / poker chip) ────────────────────
@@ -334,27 +334,43 @@ function ScrollController({
 // ── Main component ─────────────────────────────────────────────────
 export default function RingField() {
   const mockRepos = [
-    'GetLantern/lantern',
-    'HashiCorp/terraform',
-    'StackExchange/dns',
-    'stretchr/testify',
-    'gin-gonic/gin',
+    'moby/moby',
+    'prometheus-community/windows_exporter',
+    'shirou/gopsutil',
+    'microsoft/hcsshim',
+    'syncthing/syncthing',
+    'microsoft/go-winio',
+    'ryantsai/KKTerm',
+    'nawodyaishan/pdf2md-tui',
+    'itigges22/ATLAS',
     'go-gitea/gitea',
-    'caddyserver/caddy',
-    'dgraph-io/dgraph',
-    'go-resty/resty',
-    'containerd/containerd',
+    'tscircuit/schematic-trace-solver',
+    'colinhacks/zod',
     'argoproj/argo-cd',
-    'magefile/mage',
-    'harness/harness',
-    'fyne-io/fyne',
-    'etcd-io/etcd',
-    'unjs/nitro',
-    'triggerdotdev/trigger.dev',
-    'tscircuit/tscircuit',
     'kysely-org/kysely',
-    'bombshell-dev/bombshell',
+    'go-resty/resty',
+    'bombshell-dev/clack',
+    'harness/harness',
+    'unjs/ufo',
+    'triggerdotdev/trigger.dev',
+    'magefile/mage',
+    'caddyserver/caddy',
+    'StackExchange/StackExchange.Redis',
+    'hashicorp/nomad',
+    'containerd/containerd',
+    'dgraph-io/badger',
+    'etcd-io/etcd',
+    'hashicorp/consul',
+    'gin-gonic/gin',
+    'spf13/viper',
+    'stretchr/testify',
+    'getlantern/systray',
+    'fyne-io/systray',
     'LenovoLegionToolkit-Team/LenovoLegionToolkit',
+    'Shivam8292/Resume_screener',
+    'AniruddhAgrahari/open_read',
+    'oppia/oppia',
+    'Anuj-Kumar-Sharma/First-Contribution'
   ];
 
   const paddedWorks = useMemo(() => {
